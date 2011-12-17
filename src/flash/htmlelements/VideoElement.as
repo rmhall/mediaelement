@@ -47,6 +47,11 @@ package htmlelements
 		private var _isConnected:Boolean = false;
 		private var _playWhenConnected:Boolean = false;
 		private var _hasStartedPlaying:Boolean = false;
+		private var _parentReference:Object;
+
+		public function setReference(arg:Object):void {
+			_parentReference = arg;
+		}
 
 		public function get video():Video {
 			return _video;
@@ -64,6 +69,14 @@ package htmlelements
 		public function duration():Number {
 			return _duration;
 		}
+		
+		public function currentProgress():Number {
+			if(_stream != null) {
+				return Math.round(_stream.bytesLoaded/_stream.bytesTotal*100);
+			} else {
+				return 0;
+			}
+		}
 
 		public function currentTime():Number {
 			if (_stream != null) {
@@ -72,6 +85,7 @@ package htmlelements
 				return 0;
 			}
 		}
+		
 
 		// (1) load()
 		// calls _connection.connect(); 
@@ -141,6 +155,8 @@ package htmlelements
 
 				// STREAM
 				case "NetStream.Play.Start":
+				
+				
 					_isPaused = false;
 					sendEvent(HtmlMediaEvent.LOADEDDATA);
 					sendEvent(HtmlMediaEvent.CANPLAY);

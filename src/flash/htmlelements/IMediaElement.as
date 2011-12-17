@@ -23,7 +23,9 @@ package htmlelements
 		function duration():Number;
 
 		function currentTime():Number;
-
+		
+		function currentProgress():Number;
+		
 	}
 
 }

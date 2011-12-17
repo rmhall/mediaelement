@@ -54,6 +54,10 @@ package htmlelements
 		public function currentTime():Number {
 			return _currentTime;
 		}
+		
+		public function currentProgress():Number {
+				return Math.round(_bytesLoaded/_bytesTotal*100);
+		}
 
 		public function AudioElement(element:FlashMediaElement, autoplay:Boolean, preload:String, timerRate:Number, startVolume:Number) 
 		{
