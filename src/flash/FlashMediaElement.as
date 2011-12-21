@@ -706,6 +706,7 @@
 			
 			switch (_controlStyle.toUpperCase()) {
 				case "ORIGINAL":
+						// Original style bottom display
 					 _hoverTime.y=(_hoverTime.height/2)+1;
 					_hoverTime.x=0;
 					_controlBarBg.width = stage.stageWidth;
@@ -719,45 +720,70 @@
 					
 					break;
 				case "FLOATING":
+					// FLOATING MODE 300x93 rectangle
 				// _controlBar = getChildByName("controls_mc") as MovieClip;
 				 if(stage.displayState == StageDisplayState.FULL_SCREEN && !forced) {
 					 trace("THIS WAY!");
 					 _hoverTime.y=(_hoverTime.height/2)+1;
 					_hoverTime.x=0;
 					_controlBarBg.width = 300;
+					_controlBarBg.height = 93;
 					//_controlBarBg.x = (stage.stageWidth/2) - (_controlBarBg.width/2);
 					//_controlBarBg.y  = stage.stageHeight - 300;
 					
+					_pauseButton.scaleX = _playButton.scaleX=3.5;
+					_pauseButton.scaleY= _playButton.scaleY=3.5;
+					// center the play button and make it big and at the top
+					_pauseButton.x = _playButton.x = (_controlBarBg.width/2)-(_playButton.width/2)+7;
+					_pauseButton.y = _playButton.y = _controlBarBg.height-_playButton.height-(14)
+										
 					_controlBar.x = (stage.stageWidth/2) - (_controlBar.width/2);
 					_controlBar.y = stage.stageHeight - _controlBar.height-100;
 					
+					// reposition the time and duration items
 					_duration.x = _controlBarBg.width - _duration.width - 10;
+					_duration.y = _controlBarBg.height - _duration.height -7;
 					//_currentTime.x = _controlBarBg.width - _duration.width - 10 - _currentTime.width - 10;
-					 _currentTime.x = _playButton.x+_playButton.width;
-					 _scrubTrack.width = (_duration.x-_duration.width-10)-_duration.width+10;
-					 _scrubOverlay.width = _scrubTrack.width;
-					 _scrubBar.width = _scrubTrack.width;
-					
+					 _currentTime.x = 5
+					 _currentTime.y= _controlBarBg.height - _currentTime.height-7;
+					 
+					 _scrubLoaded.x = _scrubBar.x = _scrubOverlay.x = _scrubTrack.x =_currentTime.x+_currentTime.width+7;
+					_scrubLoaded.y = _scrubBar.y = _scrubOverlay.y = _scrubTrack.y=_controlBarBg.height-_scrubTrack.height-7;
+					 
+					_scrubBar.width =  _scrubOverlay.width = _scrubTrack.width = (_duration.x-_duration.width-14);
+					 
 					
 				 } else {
+					 // FLOATING MODE BOTTOM DISPLAY - similar to normal
 					  trace("THAT WAY!");
 					 _hoverTime.y=(_hoverTime.height/2)+1;
-					_hoverTime.x=0;
+					 _hoverTime.x=0;
 					 _controlBarBg.width = stage.stageWidth;
+					 _controlBarBg.height = 30;
+					 _controlBarBg.y=0;
+					 _controlBarBg.x=0;
 					// _controlBarBg.x = 0;
 					// _controlBarBg.y  = stage.stageHeight - _controlBar.height;
 					 
-					 _controlBar.x = 0;
-					 _controlBar.y = stage.stageHeight - _controlBar.height;
-					 trace(_controlBar.height,stage.stageHeight - _controlBar.height);
+					_pauseButton.scaleX = _playButton.scaleX=1;
+					_pauseButton.scaleY= _playButton.scaleY=1;
+					
+					_pauseButton.x = _playButton.x = 7;
+					_pauseButton.y = _playButton.y = _controlBarBg.height-_playButton.height-2;
+					
+					
 					
 					_duration.x = stage.stageWidth - _duration.width - 10;
 					 //_currentTime.x = stage.stageWidth - _duration.width - 10 - _currentTime.width - 10;
 					 _currentTime.x = _playButton.x+_playButton.width;
-					 _scrubTrack.width = (_duration.x-_duration.width-10)-_duration.width+10;
-					 _scrubOverlay.width = _scrubTrack.width;
-					 _scrubBar.width = _scrubTrack.width;
-					
+					_duration.y = _currentTime.y= _controlBarBg.height - _currentTime.height-7;
+
+					 _scrubLoaded.x = _scrubBar.x = _scrubOverlay.x = _scrubTrack.x =_currentTime.x+_currentTime.width+7;
+					_scrubLoaded.y = _scrubBar.y = _scrubOverlay.y = _scrubTrack.y=_controlBarBg.height-_scrubTrack.height-7;
+					 
+					_scrubBar.width =  _scrubOverlay.width = _scrubTrack.width =  (_duration.x-_duration.width-10)-_duration.width+10;
+					 _controlBar.x = 0;
+					 _controlBar.y = stage.stageHeight - _controlBar.height;
 				 }
 				 break;
 
