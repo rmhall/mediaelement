@@ -36,6 +36,7 @@
 		private var _isFullScreen:Boolean = false;
 		private var _startVolume:Number;
 		private var _controlStyle:String;
+		private var _autoHide:Boolean = true;
 
 		// native video size (from meta data)
 		private var _nativeVideoWidth:Number = 0;
@@ -68,6 +69,13 @@
 		private var _pauseButton:SimpleButton;
 		private var _duration:TextField;
 		private var _currentTime:TextField;
+		
+		// IDLE Timer for mouse for showing/hiding controls
+		private var _inactiveTime:int;
+        private var _timer:Timer;
+        private var _idleTime:int;
+        private var _isMouseActive:Boolean
+		private var _isOverStage:Boolean = false;
 
 
 		public function FlashMediaElement() {
@@ -87,6 +95,9 @@
 			_startVolume = (params['startvolume'] != undefined) ? (parseFloat(params['startvolume'])) : 0.8;
 			_preload = (params['preload'] != undefined) ? params['preload'] : "none";
 			_controlStyle = (params['controlstyle'] != undefined) ? (String(params['controlstyle'])) : "original";
+			_autoHide = (params['autohide'] != undefined) ? (String(params['autohide'])) : true;
+			
+
 			
 			if (isNaN(_timerRate))
 				_timerRate = 250;
@@ -170,6 +181,15 @@
 			_scrubOverlay.addEventListener(MouseEvent.CLICK, scrubClick);
 			_scrubOverlay.addEventListener(MouseEvent.MOUSE_OVER, scrubOver);
 			_scrubOverlay.addEventListener(MouseEvent.MOUSE_OUT, scrubOut);
+			
+			if(_autoHide && _showControls) {
+				stage.addEventListener(Event.MOUSE_LEAVE, mouseActivityLeave);
+				stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseActivityMove);
+				_inactiveTime = 2500;
+				_timer = new Timer(_inactiveTime)
+				_timer.addEventListener(TimerEvent.TIMER, idleTimer);
+				_timer.start();
+			}
 			
 			
 			_playButton = _controlBar.getChildByName("play_btn") as SimpleButton;
@@ -272,7 +292,7 @@
 			//_connection.client = this;
 			//_connection.connect(ExternalInterface.objectID + "_player");
 
-			// listen for rezie
+			// listen for resize
 			stage.addEventListener(Event.RESIZE, resizeHandler);
 
 			// test
@@ -281,8 +301,48 @@
 			// resize
 			stage.addEventListener(FullScreenEvent.FULL_SCREEN, stageFullScreen);	
 		}
+				
+		function mouseActivityMove(event:MouseEvent):void {
+			if(_autoHide && _showControls && (mouseX>=0 && mouseX<=stage.stageWidth) && (mouseY>=0 && mouseY<=stage.stageHeight)) {
+
+				// This could be move to a nice fade at some point...
+				_controlBar.visible = _showControls;
+				_isMouseActive = true;
+				_idleTime = 0;
+				_timer.reset();
+				_timer.start()
+			}
+		}
+		
+		function mouseActivityLeave(event:Event):void {
+			if(_autoHide && _showControls) {
+				_isOverStage = false;
+				// This could be move to a nice fade at some point...
+			  _controlBar.visible = !_showControls;
+			  _isMouseActive = false;
+			  _idleTime = 0;
+			  _timer.reset();
+			  _timer.stop();
+			}
+		}
+		
+		function idleTimer(event:TimerEvent):void    {
+          
+			if(_autoHide && _showControls) {
+				// This could be move to a nice fade at some point...
+				 _controlBar.visible = !_showControls;
+				  _isMouseActive = false;
+           		  _idleTime += _inactiveTime;
+			 	  _idleTime = 0;
+			 	  _timer.reset();
+			 	  _timer.stop();
+			} 
+		}
+        
 		
 		function scrubMove(event:MouseEvent):void {
+			
+			if(_showControls) {
 			if(_hoverTime.visible) {
 			var seekBarPosition:Number =  ((event.localX / _scrubTrack.width) *_mediaElement.duration())*_scrubTrack.scaleX;
 			var hoverPos:Number = (seekBarPosition / _mediaElement.duration()) *_scrubTrack.scaleX;
@@ -293,6 +353,7 @@
 			}
 			_hoverTime.y=_scrubBar.y-(_hoverTime.height/2);
 			_hoverTimeText.text = secondsToTimeCode(seekBarPosition);
+			}
 			}
 			//trace(event);
 		}
