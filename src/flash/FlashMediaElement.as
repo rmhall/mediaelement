@@ -69,6 +69,9 @@
 		private var _pauseButton:SimpleButton;
 		private var _duration:TextField;
 		private var _currentTime:TextField;
+		private var _fullscreenIcon:SimpleButton;
+		private var _volumeMuted:SimpleButton;
+		private var _volumeUnMuted:SimpleButton;
 		
 		// IDLE Timer for mouse for showing/hiding controls
 		private var _inactiveTime:int;
@@ -118,14 +121,29 @@
 			//_mediaUrl = "rtmp://stream2.france24.yacast.net/france24_live/en/f24_liveen";
 
 			//_debug=true;
+			
+			// debugging
+			_output = new TextField();
+			_output.textColor = 0xeeeeee;
+			_output.width = stage.stageWidth - 100;
+			_output.height = stage.stageHeight;
+			_output.multiline = true;
+			_output.wordWrap = true;
+			_output.border = false;
+			_output.filters = [new DropShadowFilter(1, 0x000000, 45, 1, 2, 2, 1)];
+
+			_output.text = "Initializing...\n";
+			addChild(_output);
+			_output.visible = _debug;
+			
 
 			// position and hide
 			_fullscreenButton = getChildByName("fullscreen_btn") as SimpleButton;
-			
 			_fullscreenButton.visible = false;
 			_fullscreenButton.addEventListener(MouseEvent.CLICK, fullscreenClick, false);
 			_fullscreenButton.x = stage.stageWidth - _fullscreenButton.width - 10;
 			_fullscreenButton.y = 10;
+			
 			
 			
 			// lower right
@@ -153,22 +171,6 @@
 				_mediaElement = new AudioElement(this, _autoplay, _preload, _timerRate, _startVolume);
 			}
 
-			// debugging
-			_output = new TextField();
-			_output.textColor = 0xeeeeee;
-			_output.width = stage.stageWidth - 100;
-			_output.height = stage.stageHeight;
-			_output.multiline = true;
-			_output.wordWrap = true;
-			_output.border = false;
-			_output.filters = [new DropShadowFilter(1, 0x000000, 45, 1, 2, 2, 1)];
-
-			_output.text = "Initializing...\n";
-			addChild(_output);
-			_output.visible = _debug;
-			
-						positionFullscreenButton(stage.stageWidth-85, stage.stageHeight-60);
-
 
 			// controls!
 			_controlBar = getChildByName("controls_mc") as MovieClip;
@@ -177,6 +179,7 @@
 			_scrubBar = _controlBar.getChildByName("scrubBar") as MovieClip;
 			_scrubOverlay = _controlBar.getChildByName("scrubOverlay") as MovieClip;
 			_scrubLoaded = _controlBar.getChildByName("scrubLoaded") as MovieClip;
+			
 			_scrubOverlay.addEventListener(MouseEvent.MOUSE_MOVE, scrubMove);
 			_scrubOverlay.addEventListener(MouseEvent.CLICK, scrubClick);
 			_scrubOverlay.addEventListener(MouseEvent.MOUSE_OVER, scrubOver);
@@ -191,6 +194,15 @@
 				_timer.start();
 			}
 			
+			_fullscreenIcon = _controlBar.getChildByName("fullscreenIcon") as SimpleButton;
+			
+			// New fullscreenIcon for new fullscreen floating controls
+			if(_showControls && _controlStyle.toUpperCase()=="FLOATING") {
+				_fullscreenIcon.addEventListener(MouseEvent.CLICK, fullScreenIconClick, false);
+			}
+			
+			_volumeMuted = _controlBar.getChildByName("muted_mc") as SimpleButton;
+			_volumeUnMuted = _controlBar.getChildByName("unmuted_mc") as SimpleButton;
 			
 			_playButton = _controlBar.getChildByName("play_btn") as SimpleButton;
 			_playButton.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
@@ -485,6 +497,15 @@
 				_output.appendText("error setting fullscreen: " + error.toString() + "\n");   
 			}
 		}
+		
+		function fullScreenIconClick(e:MouseEvent) {
+			try {
+				_controlBar.visible = true;
+				setFullscreen(!_isFullScreen);
+				repositionVideo(_isFullScreen);
+			} catch (error:Error) {
+			}
+		}
 
 		function fullscreenClick(e:MouseEvent) {
 			_fullscreenButton.visible = false;
@@ -740,18 +761,27 @@
 					_controlBar.x = (stage.stageWidth/2) - (_controlBar.width/2);
 					_controlBar.y = stage.stageHeight - _controlBar.height-100;
 					
+					
 					// reposition the time and duration items
+					
 					_duration.x = _controlBarBg.width - _duration.width - 10;
 					_duration.y = _controlBarBg.height - _duration.height -7;
 					//_currentTime.x = _controlBarBg.width - _duration.width - 10 - _currentTime.width - 10;
 					 _currentTime.x = 5
 					 _currentTime.y= _controlBarBg.height - _currentTime.height-7;
 					 
+					_fullscreenIcon.x = _controlBarBg.width - _fullscreenIcon.width - 7;
+					_fullscreenIcon.y = 7;
+					
+					_volumeMuted.x = _volumeUnMuted.x = 7;
+					_volumeMuted.y = _volumeUnMuted.y = 7;
+					 
 					 _scrubLoaded.x = _scrubBar.x = _scrubOverlay.x = _scrubTrack.x =_currentTime.x+_currentTime.width+7;
 					_scrubLoaded.y = _scrubBar.y = _scrubOverlay.y = _scrubTrack.y=_controlBarBg.height-_scrubTrack.height-7;
 					 
 					_scrubBar.width =  _scrubOverlay.width = _scrubTrack.width = (_duration.x-_duration.width-14);
-					 
+					_scrubLoaded.scaleX=0;
+					 _scrubBar.scaleX=0;
 					
 				 } else {
 					 // FLOATING MODE BOTTOM DISPLAY - similar to normal
@@ -773,9 +803,16 @@
 					
 					
 					
-					_duration.x = stage.stageWidth - _duration.width - 10;
 					 //_currentTime.x = stage.stageWidth - _duration.width - 10 - _currentTime.width - 10;
 					 _currentTime.x = _playButton.x+_playButton.width;
+					 
+					 _fullscreenIcon.x = _controlBarBg.width - _fullscreenIcon.width - 7;
+					 _fullscreenIcon.y = 8;
+					
+					_volumeMuted.x = _volumeUnMuted.x = _fullscreenIcon.x-_fullscreenIcon.width-7;
+					_volumeMuted.y = _volumeUnMuted.y = 10;
+					
+					_duration.x = _volumeMuted.x - _volumeMuted.width - _duration.width+7;
 					_duration.y = _currentTime.y= _controlBarBg.height - _currentTime.height-7;
 
 					 _scrubLoaded.x = _scrubBar.x = _scrubOverlay.x = _scrubTrack.x =_currentTime.x+_currentTime.width+7;
@@ -784,6 +821,8 @@
 					_scrubBar.width =  _scrubOverlay.width = _scrubTrack.width =  (_duration.x-_duration.width-10)-_duration.width+10;
 					 _controlBar.x = 0;
 					 _controlBar.y = stage.stageHeight - _controlBar.height;
+					 _scrubLoaded.scaleX=0;
+					 _scrubBar.scaleX=0;
 				 }
 				 break;
 
