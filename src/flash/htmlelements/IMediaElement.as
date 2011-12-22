@@ -1,4 +1,4 @@
-
+﻿
 package htmlelements
 {
 
@@ -17,6 +17,8 @@ package htmlelements
 		function setCurrentTime(pos:Number):void;
 
 		function setVolume(vol:Number):void;
+		
+		function getVolume():Number;
 
 		function setMuted(muted:Boolean):void;
 

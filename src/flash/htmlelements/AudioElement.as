@@ -1,4 +1,4 @@
-
+﻿
 package htmlelements 
 {
 	import flash.events.Event;
@@ -254,6 +254,14 @@ package htmlelements
 			}
 
 			sendEvent(HtmlMediaEvent.VOLUMECHANGE);
+		}
+		
+		public function getVolume():Number {
+			if(_isMuted) {
+				return 0;
+			} else {
+				return _volume;
+			}
 		}
 
 

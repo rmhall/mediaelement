@@ -180,20 +180,6 @@
 			_scrubOverlay = _controlBar.getChildByName("scrubOverlay") as MovieClip;
 			_scrubLoaded = _controlBar.getChildByName("scrubLoaded") as MovieClip;
 			
-			_scrubOverlay.addEventListener(MouseEvent.MOUSE_MOVE, scrubMove);
-			_scrubOverlay.addEventListener(MouseEvent.CLICK, scrubClick);
-			_scrubOverlay.addEventListener(MouseEvent.MOUSE_OVER, scrubOver);
-			_scrubOverlay.addEventListener(MouseEvent.MOUSE_OUT, scrubOut);
-			
-			if(_autoHide && _showControls) {
-				stage.addEventListener(Event.MOUSE_LEAVE, mouseActivityLeave);
-				stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseActivityMove);
-				_inactiveTime = 2500;
-				_timer = new Timer(_inactiveTime)
-				_timer.addEventListener(TimerEvent.TIMER, idleTimer);
-				_timer.start();
-			}
-			
 			_fullscreenIcon = _controlBar.getChildByName("fullscreenIcon") as SimpleButton;
 			
 			// New fullscreenIcon for new fullscreen floating controls
@@ -203,6 +189,9 @@
 			
 			_volumeMuted = _controlBar.getChildByName("muted_mc") as SimpleButton;
 			_volumeUnMuted = _controlBar.getChildByName("unmuted_mc") as SimpleButton;
+			
+			_volumeMuted.addEventListener(MouseEvent.CLICK, toggleVolume, false);
+			_volumeUnMuted.addEventListener(MouseEvent.CLICK, toggleVolume, false);
 			
 			_playButton = _controlBar.getChildByName("play_btn") as SimpleButton;
 			_playButton.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
@@ -218,8 +207,37 @@
 			_hoverTime = _controlBar.getChildByName("hoverTime") as MovieClip;
 			_hoverTimeText = _hoverTime.getChildByName("hoverTime_txt") as TextField;
 			_hoverTime.visible=false;
-					 _hoverTime.y=(_hoverTime.height/2)+1;
+			_hoverTime.y=(_hoverTime.height/2)+1;
 			_hoverTime.x=0;
+			
+			// Add new timeline scrubber events
+			_scrubOverlay.addEventListener(MouseEvent.MOUSE_MOVE, scrubMove);
+			_scrubOverlay.addEventListener(MouseEvent.CLICK, scrubClick);
+			_scrubOverlay.addEventListener(MouseEvent.MOUSE_OVER, scrubOver);
+			_scrubOverlay.addEventListener(MouseEvent.MOUSE_OUT, scrubOut);
+			
+			if(_autoHide && _showControls) {
+				// Add mouse activity for show/hide of controls
+				stage.addEventListener(Event.MOUSE_LEAVE, mouseActivityLeave);
+				stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseActivityMove);
+				_inactiveTime = 2500;
+				_timer = new Timer(_inactiveTime)
+				_timer.addEventListener(TimerEvent.TIMER, idleTimer);
+				_timer.start();
+				// set
+			}
+			
+			if(_showControls) {
+				if(_startVolume<=0) {
+					trace("INITIAL VOLUME: "+_startVolume+" MUTED");
+					_volumeMuted.visible=true;
+					_volumeUnMuted.visible=false;
+				} else {
+					trace("INITIAL VOLUME: "+_startVolume+" UNMUTED");
+					_volumeMuted.visible=false;
+					_volumeUnMuted.visible=true;
+				}
+			}
 	
 			_controlBar.visible = _showControls;
 			addChild(_controlBar);
@@ -563,11 +581,35 @@
 		function setVolume(volume:Number) {
 			_output.appendText("volume: " + volume.toString() + "\n");
 			_mediaElement.setVolume(volume);
+			toggleVolumeIcons(volume);
 		}
 
 		function setMuted(muted:Boolean) {
 			_output.appendText("muted: " + muted.toString() + "\n");
 			_mediaElement.setMuted(muted);
+			toggleVolumeIcons(_mediaElement.getVolume());
+		}
+		
+		function toggleVolume(event:MouseEvent):void {
+			trace(event.currentTarget.name);
+			switch(event.currentTarget.name) {
+				case "muted_mc":
+				setMuted(false);
+				break;
+				case "unmuted_mc":
+				setMuted(true);
+				break;
+			}
+		}
+		
+		function toggleVolumeIcons(volume:Number) {
+			if(volume<=0) {
+					_volumeMuted.visible=true;
+					_volumeUnMuted.visible=false;
+				} else {
+					_volumeMuted.visible=false;
+					_volumeUnMuted.visible=true;
+				}
 		}
 
 		function setVideoSize(width:Number, height:Number) {
