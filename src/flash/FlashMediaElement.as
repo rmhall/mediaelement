@@ -10,6 +10,8 @@
 	import flash.media.Video;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
+	
+	import flash.geom.ColorTransform;
 
 	import flash.filters.DropShadowFilter;
 	import flash.utils.Timer;
@@ -72,6 +74,9 @@
 		private var _fullscreenIcon:SimpleButton;
 		private var _volumeMuted:SimpleButton;
 		private var _volumeUnMuted:SimpleButton;
+		private var _scrubTrackColor:String;
+		private var _scrubBarColor:String;
+		private var _scrubLoadedColor:String;
 		
 		// IDLE Timer for mouse for showing/hiding controls
 		private var _inactiveTime:int;
@@ -99,7 +104,9 @@
 			_preload = (params['preload'] != undefined) ? params['preload'] : "none";
 			_controlStyle = (params['controlstyle'] != undefined) ? (String(params['controlstyle'])) : "original";
 			_autoHide = (params['autohide'] != undefined) ? (String(params['autohide'])) : true;
-			
+			_scrubTrackColor = (params['scrubtrackcolor'] != undefined) ? (String(params['scrubtrackcolor'])) : "0x333333";
+			_scrubBarColor = (params['scrubbarcolor'] != undefined) ? (String(params['scrubbarcolor'])) : "0xFF0000";
+			_scrubLoadedColor = (params['scrubloadedcolor'] != undefined) ? (String(params['scrubloadedcolor'])) : "0x666666";
 
 			
 			if (isNaN(_timerRate))
@@ -180,6 +187,12 @@
 			_scrubOverlay = _controlBar.getChildByName("scrubOverlay") as MovieClip;
 			_scrubLoaded = _controlBar.getChildByName("scrubLoaded") as MovieClip;
 			
+
+			
+			applyColor(_scrubTrack, _scrubTrackColor);
+			applyColor(_scrubBar, _scrubBarColor);
+			applyColor(_scrubLoaded, _scrubLoadedColor);
+			
 			_fullscreenIcon = _controlBar.getChildByName("fullscreenIcon") as SimpleButton;
 			
 			// New fullscreenIcon for new fullscreen floating controls
@@ -209,6 +222,8 @@
 			_hoverTime.visible=false;
 			_hoverTime.y=(_hoverTime.height/2)+1;
 			_hoverTime.x=0;
+			
+
 			
 			// Add new timeline scrubber events
 			_scrubOverlay.addEventListener(MouseEvent.MOUSE_MOVE, scrubMove);
@@ -265,6 +280,11 @@
 			}
 
 			positionControls();
+			
+			// Fire this once just to set the width on some dynamically sized scrub bar items;
+			_scrubBar.scaleX=0;
+			_scrubLoaded.scaleX=0;
+			
 
 			if (ExternalInterface.available) { //  && !_showControls
 
@@ -403,7 +423,6 @@
 		function scrubClick(event:MouseEvent):void {
 			//trace(event);
 			var seekBarPosition:Number =  ((event.localX / _scrubTrack.width) *_mediaElement.duration())*_scrubTrack.scaleX;
-
 
 			var tmp:Number = (_mediaElement.currentTime()/_mediaElement.duration())*_scrubTrack.width;
 			var canSeekToPosition:Boolean = _scrubLoaded.scaleX > (seekBarPosition / _mediaElement.duration()) *_scrubTrack.scaleX;
@@ -763,6 +782,13 @@
 			timeCode += ":" + ((seconds >= 10) ? seconds.toString() : "0" + seconds.toString());
 			return timeCode; //minutes.toString() + ":" + seconds.toString();
 		}
+		
+		function applyColor(item:Object, color:String):void {
+			
+			var myColor:ColorTransform = item.transform.colorTransform;
+			myColor.color = Number(color);
+			item.transform.colorTransform = myColor;
+		}
 
 		public function positionControls(forced:Boolean=false) {
 			trace("FULLSCREEN: "+_isFullScreen);
@@ -800,7 +826,7 @@
 					_pauseButton.x = _playButton.x = (_controlBarBg.width/2)-(_playButton.width/2)+7;
 					_pauseButton.y = _playButton.y = _controlBarBg.height-_playButton.height-(14)
 										
-					_controlBar.x = (stage.stageWidth/2) - (_controlBar.width/2);
+					_controlBar.x = (stage.stageWidth/2) -150;
 					_controlBar.y = stage.stageHeight - _controlBar.height-100;
 					
 					
@@ -822,8 +848,7 @@
 					_scrubLoaded.y = _scrubBar.y = _scrubOverlay.y = _scrubTrack.y=_controlBarBg.height-_scrubTrack.height-7;
 					 
 					_scrubBar.width =  _scrubOverlay.width = _scrubTrack.width = (_duration.x-_duration.width-14);
-					_scrubLoaded.scaleX=0;
-					 _scrubBar.scaleX=0;
+
 					
 				 } else {
 					 // FLOATING MODE BOTTOM DISPLAY - similar to normal
@@ -863,8 +888,7 @@
 					_scrubBar.width =  _scrubOverlay.width = _scrubTrack.width =  (_duration.x-_duration.width-10)-_duration.width+10;
 					 _controlBar.x = 0;
 					 _controlBar.y = stage.stageHeight - _controlBar.height;
-					 _scrubLoaded.scaleX=0;
-					 _scrubBar.scaleX=0;
+
 				 }
 				 break;
 
