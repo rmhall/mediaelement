@@ -187,7 +187,8 @@
 			_scrubOverlay = _controlBar.getChildByName("scrubOverlay") as MovieClip;
 			_scrubLoaded = _controlBar.getChildByName("scrubLoaded") as MovieClip;
 			
-
+			_scrubOverlay.buttonMode = true;
+			_scrubOverlay.useHandCursor = true
 			
 			applyColor(_scrubTrack, _scrubTrackColor);
 			applyColor(_scrubBar, _scrubBarColor);
