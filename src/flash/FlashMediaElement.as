@@ -796,8 +796,45 @@
 			
 			switch (_controlStyle.toUpperCase()) {
 				case "ORIGINAL":
+					//_controlBar.y = stage.stageHeight - _controlBar.height;
+				     _hoverTime.y=(_hoverTime.height/2)+1;
+					 _hoverTime.x=0;
+					 _controlBarBg.width = stage.stageWidth;
+					 _controlBarBg.height = 30;
+					 _controlBarBg.y=0;
+					 _controlBarBg.x=0;
+					// _controlBarBg.x = 0;
+					// _controlBarBg.y  = stage.stageHeight - _controlBar.height;
+					 
+					_pauseButton.scaleX = _playButton.scaleX=1;
+					_pauseButton.scaleY= _playButton.scaleY=1;
+					
+					_pauseButton.x = _playButton.x = 7;
+					_pauseButton.y = _playButton.y = _controlBarBg.height-_playButton.height-2;
+					
+					
+					
+					 //_currentTime.x = stage.stageWidth - _duration.width - 10 - _currentTime.width - 10;
+					 _currentTime.x = _playButton.x+_playButton.width;
+					 
+					 _fullscreenIcon.x = _controlBarBg.width - _fullscreenIcon.width - 7;
+					 _fullscreenIcon.y = 8;
+					
+					_volumeMuted.x = _volumeUnMuted.x = _fullscreenIcon.x-_fullscreenIcon.width-7;
+					_volumeMuted.y = _volumeUnMuted.y = 10;
+					
+					_duration.x = _volumeMuted.x - _volumeMuted.width - _duration.width+7;
+					_duration.y = _currentTime.y= _controlBarBg.height - _currentTime.height-7;
+
+					 _scrubLoaded.x = _scrubBar.x = _scrubOverlay.x = _scrubTrack.x =_currentTime.x+_currentTime.width+7;
+					_scrubLoaded.y = _scrubBar.y = _scrubOverlay.y = _scrubTrack.y=_controlBarBg.height-_scrubTrack.height-7;
+					 
+					_scrubBar.width =  _scrubOverlay.width = _scrubTrack.width =  (_duration.x-_duration.width-10)-_duration.width+10;
+					 _controlBar.x = 0;
+					 _controlBar.y = stage.stageHeight - _controlBar.height;
 						// Original style bottom display
-					 _hoverTime.y=(_hoverTime.height/2)+1;
+					/*
+					_hoverTime.y=(_hoverTime.height/2)+1;
 					_hoverTime.x=0;
 					_controlBarBg.width = stage.stageWidth;
 					_controlBar.y = stage.stageHeight - _controlBar.height;
@@ -807,7 +844,7 @@
 					 _scrubTrack.width = (_duration.x-_duration.width-10)-_duration.width+10;
 					 _scrubOverlay.width = _scrubTrack.width;
 					 _scrubBar.width = _scrubTrack.width;
-					
+					*/
 					break;
 				case "FLOATING":
 					// FLOATING MODE 300x93 rectangle
